@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wounderlust</title>
+</head>
+<body>
+     <h2> View All Listing</h2>
+     <form  action="/listing/new"  method="GET">
+        <button> Create new list</button>
+     </form>
+     <% for (let list of alllisting){%>
+        <li><a href="/list/<%=list._id%>"><%=list.title %></a></li>
+     <% }%>
+</body>
+</html>

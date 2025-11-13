@@ -3,10 +3,12 @@
    <body>
       <div class="row">
          <div class="col-6 offset-2  mt-2">
-            <h2>List Details</h2>
+            <div>
+               <b>
+                  <%=listing.title%>
+               </b>
+            </div>
             <div class=" card col-6">
-
-
                <img src="<%=listing.image%>" alt="list_img">
 
             </div>
@@ -14,9 +16,7 @@
          </div>
 
          <div class="col-6 offset-2">
-            <div>
-               <%=listing.title%>
-            </div>
+
             <div>
                <%=listing.description%>
 
@@ -48,8 +48,30 @@
                </form>
             </div>
 
-   </body>
 
+         </div>
+
+   </body>
+   <div class="col-6 offset-2">
+      <hr>
+      <h4> Leave a review</h4>
+
+      <form action="/listing/<%=listing.id%>/reviews" method="POST" novalidate class="needs-validation">
+
+         <div class="mb-3">
+            <label for="rating" class="form-label ">Rating</label><br>
+            <input type="range" class="form-range" min="1" max="5" name="reviews[rating]">
+         </div>
+         <div class="mb-3">
+            <label for="comment" class="form-label">Comment</label>
+            <textarea name="reviews[comment]" class="form-control" id="comment" cols="10" rows="3" required ></textarea>
+            <div class="invalid-feedback">Please submit valid-feedback</div>
+         </div>
+         <button class="btn btn-outline-dark"> Submit</button>
+      </form>
+       <hr>
+       <h4> All Review </h4>
+       <p><%=listing.review%></p>
 
    </div>
 

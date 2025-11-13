@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const reviews = require("./review");
 const Schema = mongoose.Schema;
 
 const listingSchema = new Schema({
@@ -25,6 +26,10 @@ const listingSchema = new Schema({
   } ,
   location: String,
   country: String,
+  reviews:[{
+    type:Schema.Types.ObjectId,
+    ref: "Review" //here we show the refence of one to many relation
+  }]
 });
 
 const Listing = mongoose.model("Listing", listingSchema);

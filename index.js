@@ -7,8 +7,9 @@ const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync= require("./util/errorusingwrapasync.js")
  const ExpressError= require("./util/ExpressError.js")//express error file use 
-const {listingSchema}=require("./schema.js")// this file use to joi validate 
+const {listingSchema,reviewsSchema}=require("./schema.js")// this file use to joi validate 
 const Mongo_Url = "mongodb://127.0.0.1:27017/wonderlust";
+const Review = require("./modles/review.js");
 
 main()
   .then(() => {
@@ -39,8 +40,7 @@ app.get("/", (req, res) => {
 //here we crate middleware for joi validation
  const validateListing=(req,res,next)=>{
    let {error} = listingSchema.validate(req.body)
- 
-  if(error){
+    if(error){
     let errmsg=error.details.map((el)=>el.message).join(","); //use to formated the error
     throw new ExpressError(400,error)
   }else{
@@ -48,8 +48,17 @@ app.get("/", (req, res) => {
   }
  }
 
-
-
+// validate reviewsSchema
+//here we crate middleware for joi validation
+ const validateReview=(req,res,next)=>{
+   let {error} = reviewsSchema.validate(req.body)
+    if(error){
+    let errmsg=error.details.map((el)=>el.message).join(","); //use to formated the error
+    throw new ExpressError(400,error)
+  }else{
+    next();
+  }
+ }
 
 //  1. Index route - show all listings
 app.get("/listing", wrapAsync(async (req, res) => {
@@ -100,6 +109,17 @@ app.delete("/listing/:id",  wrapAsync(async (req, res) => {
   await Listing.findByIdAndDelete(id);
   res.redirect("/listing");
 }));
+
+//reviews routes
+app.post("/listing/:id/reviews",validateReview,wrapAsync( async(req,res)=>{
+let listing=await Listing.findById(req.params.id);
+let newReview= new Review(req.body.reviews)
+listing.reviews.push(newReview);
+await newReview.save();
+await listing.save();
+
+res.send("new reviews saved")
+}))
 
 
 // // test the expresserror

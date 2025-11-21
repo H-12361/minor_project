@@ -1,16 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const Listing = require("./modles/listing.js")
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const wrapAsync= require("./util/errorusingwrapasync.js")
-const ExpressError= require("./util/ExpressError.js")//express error file use 
-const {listingSchema,reviewSchema}=require("./schema.js")// this file use to joi validate 
+const ExpressError = require("./util/ExpressError.js"); //express error file use
 const Mongo_Url = "mongodb://127.0.0.1:27017/wonderlust";
-const Review = require("./modles/review.js");
-const review = require("./modles/review.js");
+const listing = require("./router/listing.js");
+const reviews = require("./router/review.js");
 
 main()
   .then(() => {
@@ -18,138 +15,41 @@ main()
   })
   .catch((err) => {
     console.log(err);
-  })
+  });
 
 async function main() {
   await mongoose.connect(Mongo_Url);
 }
 
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"))
+app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true })); // use to read undefined data post by post method
 app.use(express.json()); // agar JSON body bhejni ho
-app.use(methodOverride("_method")); //used to send put req 
-app.engine("ejs", ejsMate);//use to templating
+app.use(methodOverride("_method")); //used to send put req
+app.engine("ejs", ejsMate); //use to templating
 app.use(express.static(path.join(__dirname, "/public")));
-
 
 app.get("/", (req, res) => {
   res.send("hi root node");
 });
 
 
-//here we crate middleware for joi validation
- const validateListing=(req,res,next)=>{
-   let {error} = listingSchema.validate(req.body)
-    if(error){
-    let errmsg=error.details.map((el)=>el.message).join(","); //use to formated the error
-    throw new ExpressError(400,error)
-  }else{
-    next();
-  }
- }
+app.use("/listing", listing);
+app.use("/listing/:id/reviews", reviews);
 
-// validate reviewsSchema
-//here we crate middleware for joi validation
- const validateReview=(req,res,next)=>{
-   let {error} = reviewSchema.validate(req.body)
-    if(error){
-    let errmsg=error.details.map((el)=>el.message).join(","); //use to formated the error
-    throw new ExpressError(400,error)
-  }else{
-    next();
-  }
- }
-
-//  1. Index route - show all listings
-app.get("/listing", wrapAsync(async (req, res) => {
- const alllisting = await Listing.find({});
-  res.render("listing/index", { alllisting });
-}));
-
-//  2. New route - form to create listing (MUST come before :id route)
-app.get("/listing/new", (req, res) => {
-  res.render("listing/new.ejs");
-});
-
-// 3. Create route - add listing to DB
-//  Remove the extra spaces after "/listing"
-
-  app.post("/listing",validateListing,  wrapAsync(async (req, res,next) => {
-    let new_list = new Listing(req.body.listing); 
-   await new_list.save();
-  res.redirect("/listing");
-
-  }));
-
-
-
-// 4. Edit route - show edit form
-app.get("/listing/:id/edit",wrapAsync( async (req, res) => {
-  const { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listing/edit.ejs", { listing });
-}));
-
-// 5. Update route - apply changes
-app.put("/listing/:id",validateListing, wrapAsync(async (req, res) => {
-   const { id } = req.params;
-  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-  res.redirect(`/listing/${id}`);
-}));
-
-// 6. Show route - show one listing (MUST come after /new and /:id/edit)
-app.get("/listing/:id", wrapAsync(async (req, res) => {
-  const { id } = req.params;
-  const listing = await Listing.findById(id).populate("reviews");
-  res.render("listing/show", { listing });
-}));
-// 7. Delete route
-app.delete("/listing/:id",  wrapAsync(async (req, res) => {
-  const { id } = req.params;
-  await Listing.findByIdAndDelete(id);
-  res.redirect("/listing");
-}));
-
-//reviews routes
-app.post("/listing/:id/reviews",validateReview,wrapAsync( async(req,res)=>{
-let listing=await Listing.findById(req.params.id);
-let newReview= new Review({...req.body.review, listing: listing._id })
-listing.reviews.push(newReview);
-await newReview.save();
-await listing.save();
-
-res.redirect(`/listing/${listing._id}`); 
-}))
-
-
-// Delete review route
-app.delete("/listing/:id/reviews/:reviewId" ,wrapAsync (async(req,res)=>{
-  let { id,reviewId}= req.params;
-  await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}})
-  await Review.findByIdAndDelete(reviewId);
-
-  res.redirect(`/listing/${id}`)
-}))
-  
 // // test the expresserror
-// // app.all * means all route check and no route prensent in your backend 
+// // app.all * means all route check and no route prensent in your backend
 app.all(/.*/, (req, res, next) => {
-    next(new ExpressError(404, "Page not found!"));
+  next(new ExpressError(404, "Page not found!"));
 });
 
 //middleware
-app.use((err,req,res,next)=>{
-  let{ status =500,message ="something went wrong"} = err
-    // res.status(status).send(message);
-    res.status(status).render("error.ejs",{message})
-})
-
-
+app.use((err, req, res, next) => {
+  let { status = 500, message = "something went wrong" } = err;
+  // res.status(status).send(message);
+  res.status(status).render("error.ejs", { message });
+});
 
 app.listen(8080, () => {
   console.log("Server working port 8080 well");
-
 });
-
- 

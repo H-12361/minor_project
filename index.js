@@ -8,6 +8,7 @@ const ExpressError = require("./util/ExpressError.js"); //express error file use
 const Mongo_Url = "mongodb://127.0.0.1:27017/wonderlust";
 const listing = require("./router/listing.js");
 const reviews = require("./router/review.js");
+const session= require("express-session")
 
 main()
   .then(() => {
@@ -28,6 +29,17 @@ app.use(express.json()); // agar JSON body bhejni ho
 app.use(methodOverride("_method")); //used to send put req
 app.engine("ejs", ejsMate); //use to templating
 app.use(express.static(path.join(__dirname, "/public")));
+
+// use session concept
+const sessionOption={
+  secret:"mjjshjdnsam",
+  resave:false,
+ saveUninitialized:true
+};
+//use the session
+app.use(session(sessionOption))
+
+
 
 app.get("/", (req, res) => {
   res.send("hi root node");

@@ -1,3 +1,8 @@
+if(process.env.NODE_ENV !="production"){
+require('dotenv').config()
+}
+
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -61,9 +66,9 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.get("/", (req, res) => {
-  res.send("hi root node");
-});
+// app.get("/", (req, res) => {
+//   res.send("hi root node");
+// });
 
 //here carate middleware for flash use
 app.use((req, res, next) => {
@@ -97,6 +102,8 @@ app.use((err, req, res, next) => {
 app.all(/.*/, (req, res, next) => {
   next(new ExpressError(404, "Page not found!"));
 });
+
+
 
 
 app.listen(8080, () => {

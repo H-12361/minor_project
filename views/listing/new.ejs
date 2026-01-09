@@ -1,7 +1,7 @@
 <% layout("/layout/boilerplate")%>
 
     <body>
-        <form action="/listing" method="POST" novalidate class="needs-validation">
+        <form action="/listing" method="POST" novalidate class="needs-validation"  enctype="multipart/form-data">
             <br>
             <div class="row">
                 <div class="col-6 offset-3">
@@ -26,14 +26,16 @@
 
                     </div>
 
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Image</label>
-                        <input type="text" name="listing[image]" placeholder=" Add your villa image"
+
+                       <!-- used to set image into your local system  for example img .doc .png file-->
+                     <div class="mb-3">
+                        <label for="image" class="form-label"> Upload listing Image</label>
+                        <input type="file" name="listing[image]" 
                             class="form-control">
+                            required
 
 
                     </div>
-
                     <div class="row">
                         <div class="mb-3 col-md-4">
                             <label for="price" class="form-label">Price</label>

@@ -1,22 +1,160 @@
 <% layout("/layout/boilerplate") %>
+<style>
+  .Filters {
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 35px;
+    margin-left: 24px;
+    align-items: center;
+  }
+
+  .listing {
+    text-align: center;
+    padding-right: 10px;
+    flex-direction: column;
+    opacity: 0.6;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+  }
+ 
+  .listing:hover {
+    opacity: 1;
+  }
+  .tax-info{
+    display: none;
+
+
+  }
+
+  .Toggle{
+    border: 1px solid gray;
+    align-items: center;
+    border-radius: 10px;
+    padding: 10px;
+    width: 250px;
+    margin-left: 50px;
+    
+ 
+    
+  }
+
+ 
+</style>
+
+<div class="Filters">
+      <div class="listing" data-category="Trending">
+    <i class="fa-solid fa-fire"></i>
+    <p>Trending</p>
+    </div>
+
+  <div class="listing" data-category="Room">
+    <i class="fa-solid fa-bed"></i>
+    <p>Room</p>
+  </div>
+
+  <div class="listing" data-category='Iconic Cities'>
+    <i class="fa-solid fa-city"></i>
+    <p>Iconic Cities</p>
+  </div>
+
+  <div class="listing" data-category="Mountain">
+    <i class="fa-solid fa-mountain"></i>
+    <p>Mountain</p>
+  </div>
+
+  <div class="listing" data-category="Castle">
+    <i class="fa-brands fa-fort-awesome"></i>
+    <p>Castle</p>
+  </div>
+
+  <div class="listing" data-category="Amazing-pool">
+    <i class="fa-solid fa-person-swimming"></i>
+    <p>Amazing Pool</p>
+  </div>
+
+  <div class="Toggle">
+    <div class="form-check form-switch form-check-reverse">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      role="switch"
+      id="switchCheckDefault"
+    />
+    <label class="form-check-label" for="switchCheckDefault"
+      >Display Total After Taxes</label
+    >
+  </div>
+  </div>
+  
+</div>
 
 <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1">
-
-  <% for (let listing of alllisting) { %>
-    <div class="card col listing-card">
-      <a href="/listing/<%=listing._id%>" style="text-decoration: none; color: inherit;">
-        <img src="<%=listing.image %>" class="card-img-top" alt="img" style="height: 20rem;">
-        <div class="card-img-overlay">  </div>
-        <div class="card-body">
-          <p class="card-text">
-            <b><%= listing.title %></b><br>
-            &#8377;<%= (listing.price !== null && listing.price !== undefined) 
-                        ? listing.price.toLocaleString("en-IN") 
-                        : "N/A" %> /Day
-          </p>
-        </div>
-      </a>
-    </div>
+  <%for(let listing of alllisting) { %>
+  <div class="card col listing-card">
+    <a
+      href="/listing/<%=listing._id%>"
+      style="text-decoration: none; color: inherit"
+    >
+      <img
+        src="<%=listing.image.url%>"
+        class="card-img-top"
+        alt="img"
+        style="height: 16rem"
+      />
+      <div class="card-img-overlay"></div>
+      <div class="card-body">
+        <p class="card-text">
+          <b><%= listing.title %></b><br />
+          &#8377;<%= (listing.price !== null && listing.price !== undefined) ?
+          listing.price.toLocaleString("en-IN") : "N/A" %> /Day
+          <i class="tax-info">&nbsp;  +18% GST </i>
+        </p>
+      </div>
+    </a>
+  </div>
   <%}%>
-
 </div>
+
+<script>
+ 
+  const filters = document.querySelectorAll(".listing"); // filter buttons
+ const listings = document.querySelectorAll(".listing-card"); // cards to filter
+
+filters.forEach(filter => {
+  filter.addEventListener("click", () => {
+    const category = filter.dataset.category;
+
+    // UI active class
+    filters.forEach(f => f.classList.remove("active"));
+    filter.classList.add("active");
+
+    // show/hide listings
+    listings.forEach(listing => {
+      if (category === "Trending" || listing.dataset.category === category) {
+        listing.style.display = "block"; // card layout, not flex
+      } else {
+        listing.style.display = "none";
+      }
+    });
+  });
+});
+
+
+
+  let Taxswitch = document.getElementById("switchCheckDefault");
+  Taxswitch.addEventListener("click", () => {
+    let tax  = document.getElementsByClassName('tax-info');
+    for(changeinfo of tax){
+      if(changeinfo.style.display != 'inline'){
+        changeinfo.style.display='inline'
+      }
+      else{
+         changeinfo.style.display='none'
+      }
+     
+    }
+  });
+</script>

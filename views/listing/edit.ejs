@@ -1,7 +1,7 @@
 <% layout("/layout/boilerplate") %>
 
   <body>
-    <form action="/listing/<%=listing._id%>?_method=PUT" method="POST" class="needs-validation" novalidate>
+    <form action="/listing/<%=listing._id%>?_method=PUT" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
       <div class="row">
         <div class="col-6 offset-3">
           <br>
@@ -17,10 +17,15 @@
             <textarea name="listing[description]" required class="form-control"><%= listing.description %></textarea>
             <div class="invalid-feedback">Description is required</div>
           </div>
+          <div class="mb-3">
+            Original images <br>
+            <!-- change the image qulity using cloudnary -->
+            <img src="<%= originalImg_URL %>" alt="list image"> 
+          </div>
 
           <div class="mb-3">
-            <label for="listing[image]" class="form-label">Image</label>
-            <input type="text" name="listing[image]" required class="form-control" value="<%= listing.image %>">
+            <label for="listing[image]" class="form-label">Upload  New Image</label>
+            <input type="file" name="listing[image]" class="form-control">
             <div class="invalid-feedback">Default image you can't remove</div>
           </div>
 
